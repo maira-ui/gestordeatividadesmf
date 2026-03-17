@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MF Finanças — Geoh</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display&display=swap');
+
+:root{
+  --verde:#063D30;--verde-md:#0F6E56;--verde-lt:#1D9E75;--verde-bg:#E1F5EE;--verde-borda:#5DCAA5;
+  --ouro:#C49A2A;--ouro-lt:#F0D98A;--ouro-bg:#FBF3DC;--ouro-dk:#7A5C0A;
+  --bg:#F2F0EB;--card:#FFFFFF;--borda:#E3DFD6;--texto:#1A1916;--texto-sec:#706D65;--texto-ter:#A09D97;
+  --verm:#8B2121;--verm-bg:#FDEAEA;
+  --shadow:0 1px 3px rgba(0,0,0,.08),0 4px 12px rgba(0,0,0,.05);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',system-ui,sans-serif;background:var(--bg);color:var(--texto);min-height:100vh;-webkit-font-smoothing:antialiased}
+
+/* CORES CLIENTE */
+.cc-ISR{--cc:#0F6E56;--ccbg:#E1F5EE;--ccbd:#5DCAA5}
+.cc-Palmyra{--cc:#3B6D11;--ccbg:#EAF3DE;--ccbd:#97C459}
+.cc-Bonina{--cc:#993556;--ccbg:#FBEAF0;--ccbd:#ED93B1}
+.cc-Top{--cc:#185FA5;--ccbg:#E6F1FB;--ccbd:#85B7EB}
+.cc-Larissa{--cc:#534AB7;--ccbg:#EEEDFE;--ccbd:#AFA9EC}
+.cc-Fox{--cc:#854F0B;--ccbg:#FAEEDA;--ccbd:#EF9F27}
+.cc-Black{--cc:#444441;--ccbg:#F1EFE8;--ccbd:#B4B2A9}
+
+/* HEADER */
+.header{
+  background:var(--verde);
+  padding:0 24px;
+  min-height:120px;
+  display:flex;flex-direction:column;justify-content:flex-end;padding-bottom:0;
+  position:sticky;top:0;z-index:300;
+}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;padding-top:18px;padding-bottom:14px}
+.brand{display:flex;align-items:center;gap:12px}
+.brand-logo{
+  width:40px;height:40px;border-radius:10px;
+  background:linear-gradient(135deg,var(--ouro-bg),var(--ouro-lt));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;font-size:14px;color:var(--verde);font-weight:400;letter-spacing:.02em;
+}
+.brand-info .nome{font-size:16px;font-weight:600;color:#fff;letter-spacing:-.01em}
+.brand-info .sub{font-size:11px;color:#9FE1CB;margin-top:1px}
+.header-clock{text-align:right}
+.clock-time{font-size:28px;font-weight:300;color:var(--ouro-lt);letter-spacing:-.02em;font-variant-numeric:tabular-nums;line-height:1}
+.clock-date{font-size:11px;color:#9FE1CB;margin-top:3px}
+.clock-dia{font-size:12px;color:rgba(255,255,255,.6);margin-top:1px;text-transform:capitalize}
+
+/* PROGRESSO GERAL */
+.prog-strip{padding:14px 24px 0}
+.prog-info{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.prog-label{font-size:12px;color:rgba(255,255,255,.7)}
+.prog-pct{font-size:13px;font-weight:600;color:var(--ouro-lt)}
+.prog-track{height:4px;background:rgba(255,255,255,.15);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--verde-lt),var(--ouro));border-radius:2px;transition:width .5s ease}
+
+/* DIAS */
+.dias-scroll{display:flex;gap:6px;padding:12px 24px;overflow-x:auto;scrollbar-width:none}
+.dias-scroll::-webkit-scrollbar{display:none}
+.dia-btn{
+  flex-shrink:0;padding:7px 16px;border-radius:20px;
+  border:1px solid rgba(255,255,255,.15);background:transparent;
+  font-size:11px;font-weight:500;color:rgba(255,255,255,.6);
+  cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s;
+}
+.dia-btn.hoje{border-color:rgba(255,255,255,.35);color:rgba(255,255,255,.9)}
+.dia-btn.ativo{background:var(--ouro);border-color:var(--ouro);color:var(--verde);font-weight:700}
+
+/* AVISO */
+#aviso{
+  display:none;background:var(--verm);color:#fff;
+  padding:10px 20px;font-size:12px;font-weight:500;text-align:center;
+  border-bottom:1px solid rgba(0,0,0,.1);
+}
+#aviso button{background:rgba(255,255,255,.2);border:none;color:#fff;padding:3px 10px;border-radius:6px;cursor:pointer;margin-left:10px;font-size:11px;font-family:inherit}
+
+/* CORPO */
+.corpo{padding:16px 20px 80px;max-width:680px;margin:0 auto}
+
+/* LEGENDA */
+.legenda{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--texto-sec);font-weight:500}
+.leg-pip{width:7px;height:7px;border-radius:50%}
+
+/* BLOCO */
+.bloco{margin-bottom:14px;background:var(--card);border-radius:14px;border:1px solid var(--borda);overflow:hidden;box-shadow:var(--shadow)}
+.bloco-head{
+  display:flex;align-items:center;gap:10px;
+  padding:12px 16px;border-bottom:1px solid var(--borda);
+  background:var(--bg);
+}
+.bloco-icone{font-size:16px;line-height:1}
+.bloco-titulo{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--texto-sec);flex:1}
+.bloco-badge{font-size:10px;font-weight:600;padding:3px 10px;border-radius:20px}
+.badge-pend{background:var(--ouro-bg);color:var(--ouro-dk);border:1px solid var(--ouro-lt)}
+.badge-ok{background:var(--verde-bg);color:var(--verde-md);border:1px solid var(--verde-borda)}
+.badge-vazio{background:var(--bg);color:var(--texto-ter);border:1px solid var(--borda)}
+
+/* ATIVIDADE */
+.ativ{
+  display:flex;align-items:center;gap:0;
+  border-bottom:1px solid var(--borda);
+  transition:background .1s;
+  position:relative;
+}
+.ativ:last-child{border-bottom:none}
+.ativ:hover{background:#FAFAF8}
+.ativ.feita{background:#F8F8F7}
+.ativ.vencida{background:var(--verm-bg)}
+.ativ-pip{width:4px;align-self:stretch;background:var(--ccbd,var(--borda));flex-shrink:0}
+.ativ-num{
+  font-size:11px;font-weight:700;color:var(--texto-ter);
+  width:28px;text-align:center;flex-shrink:0;padding:10px 0;
+}
+.ativ-corpo{flex:1;padding:9px 8px 9px 0;min-width:0}
+.ativ-nome{font-size:12px;font-weight:500;color:var(--texto);line-height:1.35;margin-bottom:3px}
+.ativ.feita .ativ-nome{text-decoration:line-through;color:var(--texto-ter)}
+.ativ-tags{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.tag-cli{font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;background:var(--ccbg,#eee);color:var(--cc,#333);letter-spacing:.03em}
+.tag-hora{font-size:9px;color:var(--texto-ter);background:var(--bg);padding:2px 7px;border-radius:20px;border:1px solid var(--borda)}
+.timer{font-size:9px;font-weight:700;font-family:monospace;padding:2px 7px;border-radius:6px;background:var(--ouro-bg);color:var(--ouro-dk)}
+.timer.urg{background:#FFE8CC;color:#7A3B00;animation:pisca .9s infinite}
+.timer.venc{background:var(--verm-bg);color:var(--verm)}
+.ativ-right{display:flex;align-items:center;gap:8px;padding:0 12px 0 4px;flex-shrink:0}
+.pop-btn{font-size:9px;color:var(--verde-lt);cursor:pointer;background:none;border:none;font-family:inherit;padding:0;text-decoration:underline dotted;white-space:nowrap}
+.check{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--borda);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s}
+.check.on{background:var(--verde-lt);border-color:var(--verde-lt)}
+.check.on::after{content:'✓';font-size:10px;color:#fff;font-weight:700}
+
+/* POP DRAWER */
+.pop-drawer{
+  display:none;border-top:1px solid var(--borda);
+  background:#F6FBF8;padding:10px 12px 10px 32px;
+  border-left:3px solid var(--verde-lt);
+}
+.pop-drawer.aberto{display:block}
+.pop-drawer pre{font-size:11px;color:var(--texto-sec);line-height:1.7;white-space:pre-wrap;font-family:inherit}
+
+.vazio{padding:16px;text-align:center;font-size:12px;color:var(--texto-ter)}
+
+/* FAB */
+.fab{position:fixed;bottom:22px;right:22px;width:46px;height:46px;border-radius:50%;background:var(--verde);color:var(--ouro-lt);border:none;font-size:24px;cursor:pointer;box-shadow:0 3px 12px rgba(6,61,48,.35);z-index:200;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.fab:hover{background:var(--verde-md);transform:scale(1.05)}
+
+/* FORM */
+.form-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:flex-end;justify-content:center}
+.form-overlay.aberto{display:flex}
+.form-sheet{background:var(--card);border-radius:16px 16px 0 0;padding:20px;width:100%;max-width:480px;max-height:85vh;overflow-y:auto}
+.form-titulo{font-size:14px;font-weight:700;color:var(--verde);margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fg{display:flex;flex-direction:column;gap:4px}
+.fg.full{grid-column:1/-1}
+.fg label{font-size:10px;font-weight:600;color:var(--texto-sec);text-transform:uppercase;letter-spacing:.05em}
+.fg input,.fg select,.fg textarea{font-size:13px;padding:8px 10px;border-radius:8px;border:1px solid var(--borda);background:var(--card);color:var(--texto);font-family:inherit;width:100%}
+.fg textarea{min-height:70px;resize:vertical}
+.form-btns{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.btn-s{background:var(--verde);color:var(--ouro-lt);border:none;padding:10px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit}
+.btn-c{background:transparent;border:1px solid var(--borda);padding:10px;border-radius:8px;font-size:13px;cursor:pointer;color:var(--texto-sec);font-family:inherit}
+
+@keyframes pisca{0%,100%{opacity:1}50%{opacity:.5}}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="brand">
+      <div class="brand-logo">MF</div>
+      <div class="brand-info">
+        <div class="nome">MF Finanças</div>
+        <div class="sub">Checklist Diário · Geoh</div>
+      </div>
+    </div>
+    <div class="header-clock">
+      <div class="clock-time" id="hrel"></div>
+      <div class="clock-date" id="hdata"></div>
+      <div class="clock-dia" id="hdia"></div>
+    </div>
+  </div>
+  <div class="prog-strip">
+    <div class="prog-info">
+      <span class="prog-label" id="prog-label">carregando...</span>
+      <span class="prog-pct" id="prog-pct">0%</span>
+    </div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="dias-scroll" id="dias-scroll"></div>
+</div>
+
+<div id="aviso"><span id="aviso-txt"></span><button onclick="document.getElementById('aviso').style.display='none'">fechar</button></div>
+
+<div class="corpo">
+  <div class="legenda" id="legenda"></div>
+  <div id="blocos"></div>
+</div>
+
+<button class="fab" onclick="abrirForm()" title="Nova atividade">+</button>
+
+<div class="form-overlay" id="form-overlay" onclick="if(event.target===this)fecharForm()">
+  <div class="form-sheet">
+    <div class="form-titulo">Nova atividade</div>
+    <div class="form-grid">
+      <div class="fg full"><label>Nome</label><input id="f-nome" type="text" placeholder="Ex: Conciliar banco"></div>
+      <div class="fg"><label>Cliente</label>
+        <select id="f-cli">
+          <option>ISR</option><option>Palmyra</option><option>Bonina</option>
+          <option>Top</option><option>Larissa Taveiros</option><option>Fox</option><option>Black Brownie</option>
+        </select>
+      </div>
+      <div class="fg"><label>Frequência</label>
+        <select id="f-freq">
+          <option value="diaria">Diária</option>
+          <option value="segunda">Toda segunda</option><option value="terca">Toda terça</option>
+          <option value="quarta">Toda quarta</option><option value="quinta">Toda quinta</option>
+          <option value="sexta">Toda sexta</option><option value="seg_sex">Seg e sex</option>
+          <option value="dia1e15">Dia 01 e 15</option><option value="dia25">Dia 25</option>
+          <option value="ultimoDia">Último dia</option>
+        </select>
+      </div>
+      <div class="fg"><label>Turno</label>
+        <select id="f-turno">
+          <option value="manha">Manhã (pagamentos)</option>
+          <option value="tarde">Tarde (recebimentos)</option>
+          <option value="semanal">Semanal / Mensal</option>
+        </select>
+      </div>
+      <div class="fg"><label>Horário limite</label><input id="f-hora" type="text" placeholder="09:30"></div>
+      <div class="fg full"><label>POP</label><textarea id="f-pop" placeholder="Passo a passo..."></textarea></div>
+    </div>
+    <div class="form-btns">
+      <button class="btn-c" onclick="fecharForm()">Cancelar</button>
+      <button class="btn-s" onclick="salvar()">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const SK='mf_geoh_v5';
+const DK='mf_geohdone_v5_';
+const DIAS_FULL=['domingo','segunda-feira','terça-feira','quarta-feira','quinta-feira','sexta-feira','sábado'];
+const DIAS_C=['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const MESES=['jan','fev','mar','abr','mai','jun','jul','ago','set','out','nov','dez'];
+const MESES_FULL=['janeiro','fevereiro','março','abril','maio','junho','julho','agosto','setembro','outubro','novembro','dezembro'];
+const PRIOR=['ISR','Palmyra','Bonina','Top','Larissa Taveiros','Fox','Black Brownie'];
+const CLI_CSS={'ISR':'ISR','Palmyra':'Palmyra','Bonina':'Bonina','Top':'Top','Larissa Taveiros':'Larissa','Fox':'Fox','Black Brownie':'Black'};
+const CLI_CORES={
+  'ISR':'#1D9E75','Palmyra':'#639922','Bonina':'#D4537E',
+  'Top':'#378ADD','Larissa Taveiros':'#7F77DD','Fox':'#EF9F27','Black Brownie':'#888780'
+};
+
+let diaOff=0;
+let avisados=new Set();
+let allAtiv=[];
+
+const DEFAULTS=[
+  // ── MANHÃ: PAGAMENTOS ──
+  // ISR
+  {id:'isr_cp',nome:'Cadastrar contas a pagar',cliente:'ISR',freq:'diaria',turno:'manha',hora:'09:30',pop:`1. Grupo/Play → verificar docs do dia anterior\n2. Conta Azul → cadastrar: fornecedor, valor, vencimento, categoria\n3. Anexar documento → confirmar\n\n⏰ Até 09h30`},
+  {id:'isr_bco',nome:'Conciliar banco Sicredi e Unicred',cliente:'ISR',freq:'diaria',turno:'manha',hora:'',pop:`1. Conta Azul → importar extrato Sicredi e Unicred\n2. Conciliar com contas a pagar cadastradas\n3. Dar baixa nos pagamentos confirmados\n4. Sem justificativa → verificar internet banking\n5. Não identificado → enviar para o cliente`},
+  {id:'isr_rel',nome:'Gerar relatório de contas a pagar',cliente:'ISR',freq:'diaria',turno:'manha',hora:'',pop:`1. Conta Azul → Relatórios → Contas a Pagar\n2. Gerar: vencidos em aberto\n3. Gerar: vencimentos do dia\n4. Gerar: a vencer até sexta\n5. Consolidar e enviar`},
+  {id:'isr_pgto',nome:'Cadastrar pagamentos autorizados',cliente:'ISR',freq:'diaria',turno:'manha',hora:'11:30',pop:`~11h30 → verificar listagem do cliente → cadastrar no banco\n~14h → verificar aprovação → dar baixa\n~16h → confirmar se tudo foi pago → registrar pendências`},
+  // Palmyra
+  {id:'pal_cp',nome:'Cadastrar contas a pagar',cliente:'Palmyra',freq:'diaria',turno:'manha',hora:'09:30',pop:`1. Grupo/Play → verificar docs do dia anterior\n2. Conta Azul → cadastrar: fornecedor, valor, vencimento, categoria\n3. Anexar → confirmar\n\n⏰ Até 09h30`},
+  {id:'pal_bco',nome:'Conciliar banco Sicredi e Unicred',cliente:'Palmyra',freq:'diaria',turno:'manha',hora:'',pop:`1. Conta Azul → importar extrato\n2. Conciliar com C/P\n3. Dar baixa nos confirmados\n4. Sem justificativa → internet banking\n5. Enviar para o cliente`},
+  {id:'pal_rel',nome:'Gerar relatório de contas a pagar',cliente:'Palmyra',freq:'diaria',turno:'manha',hora:'',pop:`1. Conta Azul → Relatórios → Contas a Pagar\n2. Vencidos / dia / até sexta\n3. Consolidar e enviar`},
+  {id:'pal_pgto',nome:'Cadastrar pagamentos autorizados',cliente:'Palmyra',freq:'diaria',turno:'manha',hora:'11:30',pop:`~11h30 → listagem → cadastrar\n~14h → aprovação → baixa\n~16h → confirmação`},
+  // Bonina
+  {id:'bon_cp',nome:'Cadastrar contas a pagar',cliente:'Bonina',freq:'diaria',turno:'manha',hora:'09:30',pop:`1. Grupo WhatsApp → docs do dia anterior\n2. Conta Azul → cadastrar\n3. Anexar → confirmar\n\n⏰ Até 09h30`},
+  {id:'bon_imp',nome:'Importar extrato PagSeguro',cliente:'Bonina',freq:'diaria',turno:'manha',hora:'10:00',pop:`1. PagSeguro → exportar extrato do dia anterior\n2. Importar no Conta Azul\n3. Confirmar importação\n\n⏰ Até 10h`},
+  {id:'bon_con',nome:'Conciliar contas a pagar',cliente:'Bonina',freq:'diaria',turno:'manha',hora:'',pop:`1. Conta Azul → lançamentos x C/P\n2. Dar baixa → registrar pendências`},
+  {id:'bon_msg',nome:'Enviar mensagem de conciliação',cliente:'Bonina',freq:'diaria',turno:'manha',hora:'',pop:`Enviar no grupo:\n"Bom dia! Conciliação bancária realizada.\nSaldos: [Banco 1]: R$ XX.XXX,XX | [Banco 2]: R$ XX.XXX,XX"`},
+  {id:'bon_mai',nome:'Enviar pendências para Maíra',cliente:'Bonina',freq:'diaria',turno:'manha',hora:'',pop:`1. Levantar sem conciliação → listar com valor e descrição\n2. Enviar para Maíra via WhatsApp\n3. Aguardar ok → enviar ao cliente`},
+  {id:'bon_cli',nome:'Enviar pendências ao cliente',cliente:'Bonina',freq:'diaria',turno:'manha',hora:'',pop:`1. Após ok de Maíra\n2. Enviar lista ao cliente via grupo\n3. Registrar retorno`},
+  // Top
+  {id:'top_cp',nome:'Cadastrar contas a pagar',cliente:'Top',freq:'diaria',turno:'manha',hora:'09:30',pop:`1. Grupo WhatsApp → docs do dia anterior\n2. Conta Azul → cadastrar\n3. Anexar → confirmar\n\n⏰ Até 09h30`},
+  {id:'top_imp',nome:'Importar extrato PagSeguro',cliente:'Top',freq:'diaria',turno:'manha',hora:'10:00',pop:`1. PagSeguro → exportar extrato\n2. Importar no Conta Azul\n\n⏰ Até 10h`},
+  {id:'top_con',nome:'Conciliar contas a pagar',cliente:'Top',freq:'diaria',turno:'manha',hora:''},
+  {id:'top_msg',nome:'Enviar mensagem de conciliação',cliente:'Top',freq:'diaria',turno:'manha',hora:'',pop:`"Bom dia! Conciliação realizada. Saldos: [Banco]: R$ XX.XXX,XX"`},
+  {id:'top_mai',nome:'Enviar pendências para Maíra',cliente:'Top',freq:'diaria',turno:'manha',hora:''},
+  {id:'top_cli',nome:'Enviar pendências ao cliente',cliente:'Top',freq:'diaria',turno:'manha',hora:''},
+  // Larissa
+  {id:'lar_cp',nome:'Cadastrar contas a pagar',cliente:'Larissa Taveiros',freq:'diaria',turno:'manha',hora:'09:30',pop:`1. Grupo/Play → docs do dia anterior\n2. Conta Azul → cadastrar\n3. Anexar → confirmar\n\n⏰ Até 09h30`},
+  {id:'lar_bco',nome:'Conciliar banco Sicredi e Unicred',cliente:'Larissa Taveiros',freq:'diaria',turno:'manha',hora:''},
+  {id:'lar_rel',nome:'Gerar relatório de contas a pagar',cliente:'Larissa Taveiros',freq:'diaria',turno:'manha',hora:''},
+  {id:'lar_pgto',nome:'Cadastrar pagamentos autorizados',cliente:'Larissa Taveiros',freq:'diaria',turno:'manha',hora:'11:30'},
+  // Fox
+  {id:'fox_cp',nome:'Cadastrar contas a pagar',cliente:'Fox',freq:'diaria',turno:'manha',hora:'09:30',pop:`1. Grupo WhatsApp → docs do dia anterior\n2. Conta Azul → cadastrar\n⏰ Até 09h30`},
+  {id:'fox_imp',nome:'Importar extrato Stone',cliente:'Fox',freq:'diaria',turno:'manha',hora:'10:30',pop:`1. Stone → exportar extrato\n2. Importar no Conta Azul\n⏰ Até 10h30`},
+  {id:'fox_con',nome:'Conciliar contas a pagar',cliente:'Fox',freq:'diaria',turno:'manha',hora:''},
+  {id:'fox_msg',nome:'Enviar mensagem de conciliação',cliente:'Fox',freq:'diaria',turno:'manha',hora:''},
+  {id:'fox_mai',nome:'Enviar pendências para Maíra',cliente:'Fox',freq:'diaria',turno:'manha',hora:''},
+  {id:'fox_cli',nome:'Enviar pendências ao cliente',cliente:'Fox',freq:'diaria',turno:'manha',hora:''},
+  // Black Brownie
+  {id:'blk_cp',nome:'Cadastrar contas a pagar',cliente:'Black Brownie',freq:'diaria',turno:'manha',hora:'09:30'},
+  {id:'blk_imp',nome:'Importar extrato Stone',cliente:'Black Brownie',freq:'diaria',turno:'manha',hora:'10:30',pop:`1. Stone → exportar extrato\n2. Importar no Conta Azul\n⏰ Até 10h30`},
+  {id:'blk_con',nome:'Conciliar contas a pagar',cliente:'Black Brownie',freq:'diaria',turno:'manha',hora:''},
+  {id:'blk_msg',nome:'Enviar mensagem de conciliação',cliente:'Black Brownie',freq:'diaria',turno:'manha',hora:''},
+  {id:'blk_mai',nome:'Enviar pendências para Maíra',cliente:'Black Brownie',freq:'diaria',turno:'manha',hora:''},
+  {id:'blk_cli',nome:'Enviar pendências ao cliente',cliente:'Black Brownie',freq:'diaria',turno:'manha',hora:''},
+  {id:'blk_nf',nome:'Lançar notas fiscais e cupons',cliente:'Black Brownie',freq:'diaria',turno:'manha',hora:'',pop:`1. Grupo de notas → verificar NFs e cupons do dia\n2. Conta Azul → menu Compras → lançar NFs\n3. Lançar cupons → confirmar`},
+
+  // ── TARDE: RECEBIMENTOS ──
+  // ISR
+  {id:'isr_rec',nome:'Conciliar recebimentos (aVec)',cliente:'ISR',freq:'diaria',turno:'tarde',hora:'',pop:`1. aVec → verificar comandas do dia\n2. PagSeguro → conta PagSeguro no Conta Azul\n3. Dinheiro → conta Dinheiro\n4. Pix → conta Sicredi\n5. Sinalizar divergências`},
+  // Palmyra
+  {id:'pal_rec',nome:'Conciliar recebimentos (aVec)',cliente:'Palmyra',freq:'diaria',turno:'tarde',hora:'',pop:`1. aVec → comandas do dia\n2. PagSeguro / Dinheiro / Pix → contas no Conta Azul\n3. Sinalizar divergências`},
+  // Bonina
+  {id:'bon_rec',nome:'Conciliar recebimentos cartão e Pix',cliente:'Bonina',freq:'diaria',turno:'tarde',hora:'',pop:`1. Auditoria de caixa → cartão e Pix\n2. Conciliar com Conta Azul\n3. Dar baixa → registrar divergências`},
+  // Top
+  {id:'top_rec',nome:'Conciliar recebimentos cartão e Pix',cliente:'Top',freq:'diaria',turno:'tarde',hora:'',pop:`1. Auditoria de caixa → cartão e Pix\n2. Conciliar com Conta Azul\n3. Dar baixa → registrar divergências`},
+  // Larissa
+  {id:'lar_rec',nome:'Conciliar recebimentos (aVec)',cliente:'Larissa Taveiros',freq:'diaria',turno:'tarde',hora:'',pop:`1. aVec → comandas do dia\n2. PagSeguro / Dinheiro / Pix → contas\n3. Sinalizar divergências`},
+  // Fox
+  {id:'fox_rec',nome:'Conciliar recebimentos cartão e Pix',cliente:'Fox',freq:'diaria',turno:'tarde',hora:'',pop:`1. Conta Azul → cartão e Pix\n2. Conciliar → dar baixa → registrar`},
+  // Black
+  {id:'blk_rec',nome:'Conciliar recebimentos cartão e Pix',cliente:'Black Brownie',freq:'diaria',turno:'tarde',hora:''},
+  {id:'blk_din',nome:'Confirmar recebimentos em dinheiro',cliente:'Black Brownie',freq:'diaria',turno:'tarde',hora:'',pop:`1. Conta Azul → total dinheiro do dia\n2. Enviar para cliente\n3. Aguardar confirmação → registrar`},
+
+  // ── SEMANAL / MENSAL ──
+  {id:'isr_merc',nome:'Relatório de custos com mercadoria',cliente:'ISR',freq:'segunda',turno:'semanal',hora:'',pop:`1. Conta Azul → C/P: mercadoria de harmonização\n2. Valores em aberto mês a mês\n3. Enviar para o cliente`},
+  {id:'isr_cart',nome:'Verificar faturas de cartão',cliente:'ISR',freq:'segunda',turno:'semanal',hora:''},
+  {id:'isr_ven',nome:'Conferir vencimentos da semana seguinte',cliente:'ISR',freq:'quarta',turno:'semanal',hora:'',pop:`1. Conta Azul → C/P semana seguinte\n2. Verificar sem boleto\n3. Solicitar boletos pendentes`},
+  {id:'isr_din',nome:'Conferir vendas em dinheiro com Paulo',cliente:'ISR',freq:'sexta',turno:'semanal',hora:'',pop:`1. aVec → recebimentos em dinheiro da semana\n2. Somar → enviar para Paulo\n3. Aguardar confirmação`},
+  {id:'isr_maq',nome:'Conferir taxas da maquineta',cliente:'ISR',freq:'ultimoDia',turno:'semanal',hora:'',pop:`1. Exportar extrato da maquineta\n2. ChatGPT → confrontar taxas cobradas x contratadas\n3. Divergência → reportar`},
+  {id:'isr_com',nome:'Gerar comissão da Larissa (Rel. 1186)',cliente:'ISR',freq:'dia1e15',turno:'semanal',hora:'',pop:`Dia 01: período 16–30/31 mês anterior\nDia 15: período 01–15 mês atual\n\n1. aVec → Relatório 1186 → filtrar Larissa → exportar Excel\n2. Planilha "Cálculo de Aluguel" → nova aba → colar dados\n3. Calcular comissão → criar col. Comissão Aprovada\n4. Print → enviar para Larissa → aguardar ok\n5. Lançar C/R: ISR | C/P: Larissa`},
+  {id:'pal_cart',nome:'Verificar faturas de cartão',cliente:'Palmyra',freq:'segunda',turno:'semanal',hora:''},
+  {id:'pal_ven',nome:'Conferir vencimentos da semana seguinte',cliente:'Palmyra',freq:'quarta',turno:'semanal',hora:''},
+  {id:'pal_maq',nome:'Conferir taxas da maquineta',cliente:'Palmyra',freq:'ultimoDia',turno:'semanal',hora:''},
+  {id:'pal_com',nome:'Gerar comissão (Rel. 1186)',cliente:'Palmyra',freq:'dia1e15',turno:'semanal',hora:''},
+  {id:'lar_fat',nome:'Enviar faturamento da semana',cliente:'Larissa Taveiros',freq:'segunda',turno:'semanal',hora:'',pop:`1. aVec → relatório de faturamento da semana\n2. Organizar por período\n3. Enviar para Larissa`},
+  {id:'lar_cart',nome:'Verificar faturas de cartão',cliente:'Larissa Taveiros',freq:'segunda',turno:'semanal',hora:''},
+  {id:'lar_ven',nome:'Conferir vencimentos da semana seguinte',cliente:'Larissa Taveiros',freq:'quarta',turno:'semanal',hora:''},
+  {id:'lar_maq',nome:'Conferir taxas da maquineta',cliente:'Larissa Taveiros',freq:'ultimoDia',turno:'semanal',hora:''},
+  {id:'lar_com',nome:'Gerar comissão da Larissa (Rel. 1186)',cliente:'Larissa Taveiros',freq:'dia1e15',turno:'semanal',hora:''},
+  {id:'fox_merc',nome:'Relatório de compra de mercadoria',cliente:'Fox',freq:'seg_sex',turno:'semanal',hora:''},
+  {id:'fox_meta',nome:'Atualização da meta de vendas',cliente:'Fox',freq:'segunda',turno:'semanal',hora:''},
+  {id:'fox_plan',nome:'Planejar meta do mês seguinte',cliente:'Fox',freq:'dia25',turno:'semanal',hora:''},
+  {id:'fox_nf',nome:'Verificar notas fiscais emitidas',cliente:'Fox',freq:'quinta',turno:'semanal',hora:'',pop:`1. E-mail e grupo Aracity → NFs da semana\n2. Confirmar recebimento no grupo da Fox\n3. Cadastrar no Conta Azul`},
+];
+
+function gtStr(off=0){const d=new Date();d.setDate(d.getDate()+off);return d.toISOString().slice(0,10)}
+function gDK(off=0){return DK+gtStr(off)}
+function loadA(){try{const r=localStorage.getItem(SK);return r?JSON.parse(r):DEFAULTS}catch{return DEFAULTS}}
+function saveA(a){try{localStorage.setItem(SK,JSON.stringify(a))}catch{}}
+function loadD(off=0){try{const r=localStorage.getItem(gDK(off));return r?JSON.parse(r):[]}catch{return[]}}
+function saveD(d,off=0){try{localStorage.setItem(gDK(off),JSON.stringify(d))}catch{}}
+
+function deveNoDia(freq,d){
+  const dw=d.getDay(),dm=d.getDate();
+  const ul=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+  if(freq==='diaria')return true;
+  if(freq==='segunda')return dw===1;if(freq==='terca')return dw===2;
+  if(freq==='quarta')return dw===3;if(freq==='quinta')return dw===4;
+  if(freq==='sexta')return dw===5;if(freq==='seg_sex')return dw===1||dw===5;
+  if(freq==='dia1e15')return dm===1||dm===15;
+  if(freq==='dia25')return dm===25;
+  if(freq==='ultimoDia')return dm===ul;
+  if(freq==='mensal')return dm===1;
+  return false;
+}
+
+function hMin(h){if(!h)return null;const p=h.split(':');return+p[0]*60+ +p[1]}
+function segR(h){const l=hMin(h);if(!l)return null;const n=new Date();return(l-n.getHours()*60-n.getMinutes())*60-n.getSeconds()}
+function fmtT(s){if(s<=0)return'VENCIDO';const h=Math.floor(s/3600),m=Math.floor(s%3600/60),ss=Math.floor(s%60);if(h>0)return`${h}h${String(m).padStart(2,'0')}m`;return`${String(m).padStart(2,'0')}:${String(ss).padStart(2,'0')}`}
+
+function sortA(arr){return[...arr].sort((a,b)=>{const pa=PRIOR.indexOf(a.cliente),pb=PRIOR.indexOf(b.cliente);if(pa!==pb)return pa-pb;return(hMin(a.hora)||999)-(hMin(b.hora)||999)})}
+
+function renderDias(){
+  const hj=new Date();
+  document.getElementById('dias-scroll').innerHTML=[...Array(7)].map((_,i)=>{
+    const d=new Date();d.setDate(d.getDate()+i);
+    const l=i===0?'Hoje':DIAS_C[d.getDay()]+' '+d.getDate()+'/'+String(d.getMonth()+1).padStart(2,'0');
+    return`<button class="dia-btn${i===0?' hoje':''}${diaOff===i?' ativo':''}" onclick="setDia(${i})">${l}</button>`;
+  }).join('');
+}
+
+function setDia(i){diaOff=i;renderDias();renderCorpo()}
+
+function renderLegenda(){
+  document.getElementById('legenda').innerHTML=Object.entries(CLI_CORES).map(([n,c])=>
+    `<div class="leg"><div class="leg-pip" style="background:${c}"></div>${n==='Larissa Taveiros'?'Larissa':n}</div>`
+  ).join('');
+}
+
+function blocoHTML(titulo,turno,icone,ativs,done,off){
+  const pend=ativs.filter(a=>!done.includes(a.id)).length;
+  const bClass=ativs.length===0?'badge-vazio':pend===0?'badge-ok':'badge-pend';
+  const bTxt=ativs.length===0?'nenhuma hoje':pend===0?'tudo feito!`':`${pend} pendente${pend!==1?'s':''}`;
+
+  const cards=ativs.length?ativs.map((a,i)=>{
+    const done2=done.includes(a.id);
+    const isHj=off===0;
+    const seg=isHj&&a.hora?segR(a.hora):null;
+    const venc=seg!==null&&seg<=0;
+    const urg=seg!==null&&seg>0&&seg<=1800;
+    const cc=CLI_CSS[a.cliente]||'Black';
+    let timerH='';
+    if(isHj&&a.hora&&!done2){
+      timerH=`<span class="timer${venc?' venc':urg?' urg':''}" id="t${a.id}">${fmtT(seg)}</span>`;
+    }
+    return`<div class="ativ cc-${cc}${done2?' feita':''}${venc&&!done2?' vencida':''}" id="c${a.id}">
+      <div class="ativ-pip"></div>
+      <div class="ativ-num">${String(i+1).padStart(2,'0')}</div>
+      <div class="ativ-corpo">
+        <div class="ativ-nome">${a.nome}</div>
+        <div class="ativ-tags">
+          <span class="tag-cli">${a.cliente==='Larissa Taveiros'?'Larissa':a.cliente}</span>
+          ${a.hora?`<span class="tag-hora">até ${a.hora.replace(':','h')}</span>`:''}
+          ${timerH}
+        </div>
+      </div>
+      <div class="ativ-right">
+        ${a.pop?`<button class="pop-btn" onclick="togglePop('${a.id}')">POP</button>`:''}
+        <div class="check${done2?' on':''}" onclick="togD('${a.id}',${off})"></div>
+      </div>
+    </div>
+    ${a.pop?`<div class="pop-drawer" id="pd${a.id}"><pre>${a.pop}</pre></div>`:''}`;
+  }).join(''):'<div class="vazio">Nenhuma atividade neste turno hoje</div>';
+
+  return`<div class="bloco">
+    <div class="bloco-head">
+      <span class="bloco-icone">${icone}</span>
+      <span class="bloco-titulo">${titulo}</span>
+      <span class="bloco-badge ${bClass}">${bTxt}</span>
+    </div>
+    ${cards}
+  </div>`;
+}
+
+function renderCorpo(){
+  allAtiv=loadA();
+  const d=new Date();d.setDate(d.getDate()+diaOff);
+  const done=loadD(diaOff);
+  const hoje=allAtiv.filter(a=>deveNoDia(a.freq,d));
+  const manha=sortA(hoje.filter(a=>a.turno==='manha'));
+  const tarde=sortA(hoje.filter(a=>a.turno==='tarde'));
+  const sem=sortA(hoje.filter(a=>a.turno==='semanal'));
+
+  const total=hoje.length,feitas=done.filter(id=>hoje.find(a=>a.id===id)).length;
+  const pct=total?Math.round(feitas/total*100):0;
+  document.getElementById('prog-fill').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=pct+'%';
+  document.getElementById('prog-label').textContent=`${feitas} de ${total} atividades${diaOff===0?' hoje':' neste dia'}`;
+
+  document.getElementById('blocos').innerHTML=[
+    blocoHTML('Manhã — Pagamentos & Conciliação','manha','☀️',manha,done,diaOff),
+    blocoHTML('Tarde — Recebimentos','tarde','🌤️',tarde,done,diaOff),
+    blocoHTML('Semanal & Mensal','semanal','📋',sem,done,diaOff),
+  ].join('');
+}
+
+function togglePop(id){document.getElementById('pd'+id)?.classList.toggle('aberto')}
+function togD(id,off){const d=loadD(off);const i=d.indexOf(id);if(i>=0)d.splice(i,1);else d.push(id);saveD(d,off);renderCorpo()}
+function abrirForm(){document.getElementById('form-overlay').classList.add('aberto')}
+function fecharForm(){document.getElementById('form-overlay').classList.remove('aberto')}
+function salvar(){
+  const nome=document.getElementById('f-nome').value.trim();
+  if(!nome){alert('Informe o nome.');return}
+  const a=loadA();
+  a.push({id:'x'+Date.now(),nome,cliente:document.getElementById('f-cli').value,freq:document.getElementById('f-freq').value,turno:document.getElementById('f-turno').value,hora:document.getElementById('f-hora').value.trim(),pop:document.getElementById('f-pop').value.trim()});
+  saveA(a);document.getElementById('f-nome').value='';document.getElementById('f-hora').value='';document.getElementById('f-pop').value='';
+  fecharForm();renderCorpo();
+}
+
+function tick(){
+  const n=new Date();
+  document.getElementById('hrel').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0')+':'+String(n.getSeconds()).padStart(2,'0');
+  if(diaOff!==0)return;
+  const done=loadD(0);const d=new Date();
+  allAtiv.filter(a=>deveNoDia(a.freq,d)&&a.hora&&!done.includes(a.id)).forEach(a=>{
+    const el=document.getElementById('t'+a.id);if(!el)return;
+    const seg=segR(a.hora);el.textContent=fmtT(seg);
+    el.className='timer'+(seg<=0?' venc':seg<=1800?' urg':'');
+    document.getElementById('c'+a.id)?.classList.toggle('vencida',seg<=0);
+    if(seg<=0&&!avisados.has(a.id)){
+      avisados.add(a.id);
+      document.getElementById('aviso-txt').textContent=`Horário vencido: ${a.nome} (${a.cliente})`;
+      document.getElementById('aviso').style.display='block';
+    }
+  });
+}
+
+const hj=new Date();
+document.getElementById('hdata').textContent=hj.getDate()+' de '+MESES_FULL[hj.getMonth()]+' de '+hj.getFullYear();
+document.getElementById('hdia').textContent=DIAS_FULL[hj.getDay()];
+renderDias();renderLegenda();renderCorpo();
+setInterval(tick,1000);tick();
+</script>
+</body>
+</html>
